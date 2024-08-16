@@ -1,18 +1,25 @@
 import express from 'express';
-import connectDB from './config/db.js'; // Убедитесь, что импорт db.js правильный
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import authMiddleware from './middlewares/authMiddleware.js'; 
 
 const app = express();
 
-// Подключаемся к базе данных
 connectDB();
 
 app.use(express.json());
+
+app.use('/api/auth', authRoutes);
+
+app.get('/api/protected', authMiddleware, (req, res) => {
+  res.json({ msg: 'Protected route accessed', userId: req.user });
+});
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, (err) => {
   if (err) {
     console.error('Error starting the server:', err);
