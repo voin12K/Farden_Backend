@@ -1,15 +1,22 @@
 import express from 'express';
+import connectDB from './config/db.js'; // Убедитесь, что импорт db.js правильный
 
 const app = express();
 
+// Подключаемся к базе данных
+connectDB();
+
+app.use(express.json());
+
 app.get('/', (req, res) => {
-    res.send('Hello, World!');
+  res.send('Hello, World!');
 });
 
-app.listen(5000, (err) => { 
-    if (err) {
-        return console.log(err);
-    }
-    console.log('%cServer running on http://localhost:5000', 'color: green'); 
+const PORT = 5000;
+app.listen(PORT, (err) => {
+  if (err) {
+    console.error('Error starting the server:', err);
+  } else {
+    console.log(`Server running on http://localhost:${PORT}`);
+  }
 });
-Кассель (KSF)
