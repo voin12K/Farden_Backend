@@ -1,21 +1,31 @@
 import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
-const JWT_SECRET = '123';
-
-const authMiddleware = (req, res, next) => {
-  const token = req.header('x-auth-token');
-
+export const authMiddleware = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
   if (!token) {
-    return res.status(401).json({ msg: 'No token, authorization denied' });
+    return res.status(401).json({ message: 'No token, authorization denied' });
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded.userId;
+    const decoded = jwt.verify(token, 'a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890');
+    req.user = decoded.user;
     next();
   } catch (err) {
-    res.status(401).json({ msg: 'Token is not valid' });
+    res.status(401).json({ message: 'Token is not valid' });
   }
 };
 
-export default authMiddleware; 
+// Middleware для проверки прав администратора
+export const adminMiddleware = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (user && user.isAdmin) {
+      next();
+    } else {
+      res.status(403).json({ message: 'Access denied: Admins only' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

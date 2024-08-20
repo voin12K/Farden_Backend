@@ -1,29 +1,34 @@
 import express from 'express';
-import connectDB from './config/db.js';
+import mongoose from 'mongoose';
 import authRoutes from './routes/authRoutes.js';
-import authMiddleware from './middlewares/authMiddleware.js'; 
+import productRoutes from './routes/productRoutes.js';
+import { authMiddleware, adminMiddleware } from './middlewares/authMiddleware.js';
 
 const app = express();
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/my-clothing-store', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB Connected');
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+};
 
 connectDB();
 
 app.use(express.json());
 
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); 
+app.use('/api/products', productRoutes); 
 
-app.get('/api/protected', authMiddleware, (req, res) => {
-  res.json({ msg: 'Protected route accessed', userId: req.user });
-});
-
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
+app.get('/admin', authMiddleware, adminMiddleware, (req, res) => {
+  res.send('Welcome Admin!');
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, (err) => {
-  if (err) {
-    console.error('Error starting the server:', err);
-  } else {
-    console.log(`Server running on http://localhost:${PORT}`);
-  }
-});
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
