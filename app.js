@@ -8,13 +8,13 @@ const app = express();
 
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb://localhost:27017/my-clothing-store', {
+    await mongoose.connect('mongodb+srv://vladleurda02:Ad1qqzbYk6kzhm84@cluster0.cet0e.mongodb.net/my-clothing-store', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
     console.log('MongoDB Connected');
   } catch (err) {
-    console.error(err.message);
+    console.error('Error connecting to MongoDB:', err.message);
     process.exit(1);
   }
 };
