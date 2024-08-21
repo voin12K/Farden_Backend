@@ -1,14 +1,17 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import authRoutes from './routes/authRoutes.js';
-import productRoutes from './routes/productRoutes.js';
-import { authMiddleware, adminMiddleware } from './middlewares/authMiddleware.js';
+
+mongoose.set('strictQuery', false);
+
+const MONGO_URI = 'mongodb+srv://vladleurda02:Ad1qqzbYk6kzhm84@cluster0.cet0e.mongodb.net/my-clothing-store';
+const PORT = process.env.PORT || 5000;
 
 const app = express();
 
-const connectDB = async () => {
+const connectDB = async (uri) => {
   try {
-    await mongoose.connect('mongodb+srv://vladleurda02:Ad1qqzbYk6kzhm84@cluster0.cet0e.mongodb.net/my-clothing-store', {
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -19,16 +22,14 @@ const connectDB = async () => {
   }
 };
 
-connectDB();
+connectDB(MONGO_URI);
 
 app.use(express.json());
 
-app.use('/api/auth', authRoutes); 
-app.use('/api/products', productRoutes); 
-
-app.get('/admin', authMiddleware, adminMiddleware, (req, res) => {
-  res.send('Welcome Admin!');
+app.get('/', (req, res) => {
+  res.send('Hello World!');
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

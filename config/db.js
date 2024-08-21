@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
+import { MONGO_URI } from './config.js';
 
 const connectDB = async () => {
   try {
     console.log('Connecting to MongoDB...');
-    await mongoose.connect('mongodb+srv://vladleurda02:Ad1qqzbYk6kzhm84@cluster0.cet0e.mongodb.net/my-clothing-store', {
+    await mongoose.connect(MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
