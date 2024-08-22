@@ -1,9 +1,10 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import authRoutes from './routes/authRoutes.js'; 
 
 mongoose.set('strictQuery', false);
 
-const MONGO_URI = 'mongodb+srv://vladleurda02:Ad1qqzbYk6kzhm84@cluster0.cet0e.mongodb.net/my-clothing-store';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://vladleurda02:Ad1qqzbYk6kzhm84@cluster0.cet0e.mongodb.net/my-clothing-store';
 const PORT = process.env.PORT || 5000;
 
 const app = express();
@@ -25,6 +26,7 @@ const connectDB = async (uri) => {
 connectDB(MONGO_URI);
 
 app.use(express.json());
+app.use('/api/auth', authRoutes); 
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
