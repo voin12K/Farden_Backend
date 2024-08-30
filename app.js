@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import authRoutes from './routes/authRoutes.js'; 
+import cors from 'cors';
 
 mongoose.set('strictQuery', false);
 
@@ -26,11 +27,13 @@ const connectDB = async (uri) => {
 connectDB(MONGO_URI);
 
 app.use(express.json());
+app.use(cors());
 app.use('/api/auth', authRoutes); 
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
