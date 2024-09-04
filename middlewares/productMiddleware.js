@@ -2,11 +2,7 @@ import mongoose from 'mongoose';
 
 function generateRandomSKU() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  for (let i = 0; i < 8; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
+  return Array.from({ length: 8 }, () => characters.charAt(Math.floor(Math.random() * characters.length))).join('');
 }
 
 const productSchema = new mongoose.Schema({
@@ -14,7 +10,7 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  scu: {
+  sku: { 
     type: String,
     required: true,
     unique: true, 
@@ -66,13 +62,13 @@ const productSchema = new mongoose.Schema({
 });
 
 productSchema.pre('save', async function (next) {
-  if (this.isNew) { 
+  if (this.isNew) {
     let isUnique = false;
     while (!isUnique) {
       const randomSKU = generateRandomSKU();
-      const existingProduct = await this.constructor.findOne({ scu: randomSKU });
+      const existingProduct = await this.constructor.findOne({ sku: randomSKU });
       if (!existingProduct) {
-        this.scu = randomSKU; 
+        this.sku = randomSKU; 
         isUnique = true;
       }
     }
