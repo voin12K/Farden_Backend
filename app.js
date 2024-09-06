@@ -1,14 +1,19 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import authRoutes from './routes/authRoutes.js'; 
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
 
-mongoose.set('strictQuery', false);
-
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://vladleurda02:Ad1qqzbYk6kzhm84@cluster0.cet0e.mongodb.net/my-clothing-store';
-const PORT = process.env.PORT || 5000;
+import authRoutes from './routes/authRoutes.js';
+import orderRoutes from './routes/orderRoutes.js'; 
+import userRoutes from './routes/userRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 
 const app = express();
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://vladleurda02:Ad1qqzbYk6kzhm84@cluster0.cet0e.mongodb.net/my-clothing-store';
+const PORT = process.env.PORT || 5000;
+const JWT_SECRET = 'secret123'; 
+
+mongoose.set('strictQuery', false);
 
 const connectDB = async (uri) => {
   try {
@@ -30,7 +35,7 @@ const checkAuth = (req, res, next) => {
     return res.status(401).json({ message: 'No token, authorization denied' });
   }
   try {
-    const decoded = jwt.verify(token, 'secret123');
+    const decoded = jwt.verify(token, JWT_SECRET); 
     req.user = decoded;
     next();
   } catch (err) {
@@ -46,7 +51,7 @@ app.get('/auth/me', checkAuth, async (req, res) => {
     }
     res.json({ user });
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err });
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 
@@ -54,7 +59,11 @@ connectDB(MONGO_URI);
 
 app.use(express.json());
 app.use(cors());
-app.use('/api/auth', authRoutes); 
+
+app.use('/api/auth', authRoutes);
+app.use('/api/orders', orderRoutes); 
+app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
