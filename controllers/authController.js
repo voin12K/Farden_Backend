@@ -21,7 +21,6 @@ export const register = async (req, res) => {
   }
 };
 
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -39,7 +38,14 @@ export const login = async (req, res) => {
     const payload = { userId: user._id };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(200).json({ token });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 3600000,
+    });
+
+    res.status(200).json({ msg: 'Logged in successfully' });
   } catch (err) {
     res.status(500).json({ msg: 'Server error', error: err.message });
   }
