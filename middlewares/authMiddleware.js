@@ -14,7 +14,7 @@ export const authMiddleware = async (req, res, next) => {
 
       next();
     } catch (error) {
-      console.error(error);
+      console.error('Token verification failed:', error);
       res.status(401).json({ message: 'Not authorized, token failed' });
     }
   } else {

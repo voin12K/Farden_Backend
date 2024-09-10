@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 
 import config from './config/config.js'; 
+import connectDB from './config/db.js'; // Импортируем функцию подключения к БД
 import User from './models/User.js'; 
 import authRoutes from './routes/authRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
@@ -16,21 +17,14 @@ const { MONGO_URI, PORT, JWT_SECRET } = config;
 
 mongoose.set('strictQuery', false);
 
+app.use(express.json()); 
 app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 
-const connectDB = async (uri) => {
-  try {
-    console.log('Connecting to MongoDB...');
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('MongoDB Connected');
-  } catch (err) {
-    console.error('Error connecting to MongoDB:', err.message);
-    process.exit(1);
-  }
-};
+connectDB(MONGO_URI);
 
 const checkAuth = (req, res, next) => {
   const token = req.cookies.token;
@@ -42,7 +36,7 @@ const checkAuth = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Token is not valid' });
+    return res.status(401).json({ message: 'Token is not valid' });
   }
 };
 
@@ -58,23 +52,18 @@ app.get('/auth/me', checkAuth, async (req, res) => {
   }
 });
 
-connectDB(MONGO_URI);
-
-app.use(express.json());
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}));
-
-
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 
-
 app.use((req, res, next) => {
   res.status(404).json({ message: 'Route not found' });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Server Error' });
 });
 
 app.listen(PORT, () => {
