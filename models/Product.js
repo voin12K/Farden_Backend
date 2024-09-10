@@ -5,9 +5,10 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  scu: {
+  sku: {  
     type: String,
     required: true,
+    unique: true, 
   },
   description: {
     type: String,
@@ -22,22 +23,22 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['shirts', 'hoodies', 'pants', 'shorts', 'headwear', 'underwear', 'dress', 't-shirts', 'jeans', 'sweatshirts', 'sweaters', 'sportswear', 'formal suits', 'underpants'], 
+    enum: ['shirts', 'hoodies', 'pants', 'shorts', 'headwear', 'underwear', 'dress', 't-shirts', 'jeans', 'sweatshirts', 'sweaters', 'sportswear', 'formal suits', 'underpants'],
     required: true,
   },
   size: {
     type: String,
-    enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],  
+    enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     required: true,
   },
   gender: {
     type: String,
-    enum: ['male', 'female', 'unisex'],  
+    enum: ['male', 'female', 'unisex'],
     required: true,
   },
   ageCategory: {
     type: String,
-    enum: ['adult', 'child'], 
+    enum: ['adult', 'child'],
     required: true,
   },
   image: {
@@ -54,7 +55,6 @@ const productSchema = new mongoose.Schema({
     default: 0,
   }
 });
-
 
 const Product = mongoose.model('Product', productSchema);
 
